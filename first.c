@@ -8,13 +8,15 @@ struct node
 {
     struct node *prev;
     struct node *next;
-    int data;
     char songame[50];
-};
+}node;
+
+
 struct node *head;
 
 int main()
 	{
+		
     	char *place, *command, *name, *yon, *referenceName; 
     	char l[100];
     	struct node *ptr;
@@ -24,7 +26,13 @@ int main()
 		    {
 		        return 0;
 		    }
-
+		FILE *outf = fopen("output.txt", "w");
+		    if (outf == NULL)
+		    {
+		        printf("\nError opening output.txt file");
+		        return 1;
+		    }
+		    
 		    while (fgets(l, 100, f) != NULL)
 		    {
 			        command = strtok(l, "\t");
@@ -60,7 +68,6 @@ int main()
 							       head->prev=ptr;
 							       head=ptr;
 							   }
-							   printf("\nNode inserted\n");
 							}
 			            }
 			            else if(!strcmp("T", place)){
@@ -100,26 +107,47 @@ int main()
 						ptr = head;
 			           
 			            if(ptr==NULL){
-			            	printf("No Song To Print\n");
+			            	fprintf(outf, "No Songs To Play\n");
 						}
 						else{
 							if(!strcmp("F", yon)){
 							printf("PrintPlaylist\n");
 							while(ptr!= NULL)
 					    	{
-							printf("%s\n",ptr->songame);
+							fprintf(outf,"%s\n",ptr->songame);
+							ptr=ptr->next;
+					   		}
+							}
+							
+							else if(!strcmp("R", yon)){
+							printf("PrintPlaylist\n");
+								struct node* prev = NULL;
+					    		struct node* current = head;
+					    		struct node* next = NULL;
+					    		while (current != NULL) {
+					       		next = current->next;
+					        	current->next = prev;
+					        	prev = current;
+					        	current = next;
+					    	}
+					    	head = prev;
+					    	ptr=head;
+							while(ptr!= NULL)
+					    	{
+							fprintf(outf,"%s\n",ptr->songame);
 							ptr=ptr->next;
 					   		}
 							}
 							
 						}
-						printf("\n*****\n");
+						fprintf(outf, "*****\n");
 					    
 			        } 
 			        
 					else if(!strcmp("RemoveSong", command)){
 			            name = strtok(NULL, "\n"); 
 			            struct node *temp;
+			            
 					    ptr = head;
 					    while(strcmp(ptr ->next->songame,name) != 0)
 					    ptr = ptr -> next;
@@ -141,75 +169,141 @@ int main()
 					    }
 			            printf("RemoveSong\n");
 			        }
-			        /*
+			        
 			        else if(!strcmp("MoveSong", command))
 			        {
 			            place = strtok(NULL, "\t"); //tab gelene kadar olan kýsm
 			            name = strtok(NULL, "\t");
 						referenceName = strtok(NULL, "\n");  //satýr sonu kontrol
-			            printf("MoveSong\n");
-			            struct node *ptr, *temp;
+			             	struct node *tmp1 = (struct node*) malloc(sizeof(node)); 
+			             	
 						    ptr = head;
-						    while(strcmp(ptr ->next->songame,name) != 0)
-						    ptr = ptr -> next;
-						    if(ptr -> next == NULL)
-						    {
-						        printf("\nCan't move\n");
-						    }
-						    else if(ptr -> next -> next == NULL)
-						    {
-						        ptr ->next = NULL;
-						    }
-						    else
-						    {
-						        temp = ptr -> next;
-						        ptr -> next = temp -> next;
-						        temp -> next -> prev = ptr;
-						        free(temp);
-						        printf("\nnode deleted\n");
-						    }
-			        }
-			        */
-			        else if(!strcmp("PlaySong", command)){
-					
-			            yon = strtok(NULL, "\n");  //satýr sonu kontrol
-			            //printf("PlaySong\n");
-			            if(!strcmp("N",yon)){
-			            	if(ptr==NULL)
-			            		printf("No Song To Play\n");
-							else{
-						    ptr = head;
-						    while(ptr->next!= NULL)
-					    	{
-							printf("%s\n",ptr->songame);
-							ptr=ptr->next;
-					   		};
-						    if (ptr->next==NULL)
-						        printf("No songs to play\n");
-						    else{
-						        printf("Playing : %s\n",ptr->next->songame);
-						        printf("----------------------\n");
-						    }
-							}
+						    strcpy(tmp1->songame, name);
 						    
+						    if(!strcmp("A",place)){
+							
+						     while(ptr != NULL && strcmp(ptr->songame,referenceName) != 0 &&ptr->next != NULL){
+							        ptr = ptr->next;
+							    }
+							
+							    if(ptr == NULL){
+							        return;
+							    }
+							
+							    if(ptr->next == NULL){
+							        ptr->next = tmp1;
+							        tmp1->prev = ptr;
+							        tmp1->next = NULL;
+							        ptr=tmp1;
+							        return;
+							    }
+							
+							    ptr->next->prev = tmp1;
+							    tmp1->next = ptr->next;
+							    ptr->next = tmp1;
+							    tmp1->prev = ptr;
+							    ptr->next=tmp1->prev->next;
+							    head->next=ptr;
+						}else{
+							
+							 if(!strcmp(ptr->songame, referenceName)){
+						      
+						        return;
+						    	}
+						    	ptr=head;
+								while(ptr!= NULL && strcmp(ptr->next->songame,name)){
+							    ptr = ptr->next;
+							    }
+							    
+							    struct node *tmp2;
+							    struct node *tasinacak;
+							    tasinacak=ptr->next;
+							    ptr->next=ptr->next->next;
+							    
+							    tmp1=head;
+							   	while(tmp1!= NULL && strcmp(tmp1->next->songame,referenceName)){
+							    tmp1 = tmp1->next;
+							    }
+							    
+							    tasinacak->next=tmp1->next;
+							    tmp1->next=tasinacak;
+							    
+							    if(ptr == NULL){
+							        return;
+							    }
+							   
+							    printf("%s",ptr->songame);
+							   
+							}
+					}
+			        
+			       else if(!strcmp("PlaySong", command)){
+			       		
+						yon = strtok(NULL, "\n"); 
+						ptr = head;
+						if(ptr==NULL){
+			           	fprintf(outf, "No Songs To Play\n*****\n");
+			           
 						}
-						printf("*****\n");
+						else{
+			            if(!strcmp("N",yon)){	
+							if(ptr->next!=NULL){	
+								ptr=ptr->next;
+								fprintf(outf,"Playing : %s\n",ptr->songame);
+							}
+							else{
+								struct node* prev = NULL;
+					    		struct node* current = head;
+					    		struct node* next = NULL;
+								 while (current != NULL) {
+					        		next = current->next;
+					        		current->next = prev;
+					        		prev = current;
+					        		current = next;
+					   			 }
+					    		head = prev;
+					    		ptr=head;
+			            		fprintf(outf,"Playing : %s\n",ptr->songame);
+							}
+			            
+						}
+						else if(!strcmp("P",yon)){
+							
+							if(ptr->prev!=NULL){	
+								ptr=ptr->prev;
+								printf("Playing : %s\n",ptr->songame);
+								
+							}
+							else{
+								struct node* prev = NULL;
+					    		struct node* current = head;
+					    		struct node* next = NULL;
+								 while (current != NULL) {
+					        		next = current->next;
+					        		current->next = prev;
+					        		prev = current;
+					        		current = next;
+					   			 }
+					    		head = prev;
+					    		ptr=head;
+			            		fprintf(outf,"Playing : %s\n",ptr->songame);
+							}
+							
+						}
+						fprintf(outf, "*****\n");
+						}
+						
 			        }
 					else if(!strcmp("ReversePlaylist", strtok(l, "\n")))
 			        {
-			        	yon = strtok(NULL, "\n"); 
-			            printf("ReversePlaylist\n");
+			        
+        				
 			        	struct node* prev = NULL;
 					    struct node* current = head;
 					    struct node* next = NULL;
 					    while (current != NULL) {
-					        // Store next
 					        next = current->next;
-					
-					        // Reverse current node's pointer
 					        current->next = prev;
-					
-					        // Move pointers one position ahead.
 					        prev = current;
 					        current = next;
 					    }
@@ -219,5 +313,6 @@ int main()
 		
 		fclose(f);
 		free(ptr);
+		fclose(outf);
 		return 0;
 	}

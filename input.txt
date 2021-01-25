@@ -10,8 +10,8 @@ InsertSong	T	Song_D
 InsertSong	T	Song_E
 InsertSong	T	Song_F
 PrintPlaylist	F
-MoveSong	B	Song_E		Song_D
-MoveSong	A	Song_B		Song_A
+MoveSong	B	Song_E	Song_D
+MoveSong	A	Song_B	Song_A
 PrintPlaylist	F
 RemoveSong	Song_F
 PrintPlaylist	F
@@ -28,4 +28,4 @@ PlaySong	N
 PlaySong	N
 PlaySong	N
 PlaySong	P
-RemoveSong	Song_A
+RemoveSong	Song_D
